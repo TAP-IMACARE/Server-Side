@@ -1,7 +1,9 @@
-const Admin = require("../models/admin.model");
 const responses = require("../utils/response");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
+const Admin = require("../models/admin.model");
+const generateResetPin = require("../utils/generateResetPin");
+const sendMail = require("../utils/resetPasswordMail");
 
 const adminSignUpService = async (payload) => {
   const { userId, emailAddress } = payload;
@@ -62,7 +64,39 @@ const adminLoginService = async (payload) => {
   );
 };
 
+const forgotPasswordService = async (payload) => {
+  const { emailAddress } = payload;
+  const foundUser = await Admin.findOne({ emailAddress: emailAddress });
+  if (!emailAddress) {
+    return responses.buildFailureResponse("Admin does not exist", 400);
+  }
+  const resetPin = generateResetPin();
+  const updatedUser = await Admin.findByIdAndUpdate(
+    { _id: foundUser._id },
+    { resetPin: resetPin },
+    { new: true }
+  );
+  sendMail(updatedUser.emailAddress, resetPin);
+  return responses.buildSuccessResponse(
+    "OTP sent successfully",
+    200,
+    updatedUser
+  );
+};
+
+const verifyOTPService = async (payload) => {
+  const { resetPin } = payload;
+  const foundUser = await Admin.findOne({ resetPin: resetPin });
+  if (!foundUser) {
+    return responses.buildFailureResponse("Invalid OTP", 400);
+  }
+
+  return responses.buildSuccessResponse("User found", 200, foundUser);
+};
+
 module.exports = {
   adminSignUpService,
   adminLoginService,
+  forgotPasswordService,
+  verifyOTPService,
 };

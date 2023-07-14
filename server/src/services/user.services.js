@@ -1,7 +1,9 @@
 const bcrypt = require("bcrypt");
+const jwt = require("jsonwebtoken");
 const User = require("../models/user.model");
 const responses = require("../utils/response");
-const jwt = require("jsonwebtoken");
+const sendMail = require("../utils/resetPasswordMail");
+const generateResetPin = require("../utils/generateResetPin");
 
 const createUserService = async (payload) => {
   const { emailAddress } = payload;
@@ -54,7 +56,41 @@ const userLoginService = async (payload) => {
   );
 };
 
+const forgotPasswordService = async (payload) => {
+  const { emailAddress } = payload;
+
+  const foundUser = await User.findOne({ emailAddress: emailAddress });
+  if (!foundUser) {
+    return responses.buildFailureResponse("User does not exist", 400);
+  }
+  const resetPin = generateResetPin();
+  const updatedUser = await User.findByIdAndUpdate(
+    { _id: foundUser._id },
+    { resetPin: resetPin },
+    { new: true }
+  );
+
+  sendMail(updatedUser.emailAddress, resetPin);
+  return responses.buildSuccessResponse(
+    "OTP sent Succesfully",
+    200,
+    updatedUser
+  );
+};
+
+const verifyOTPService = async (payload) => {
+  const { resetPin } = payload;
+  const foundUser = await User.findOne({ resetPin: resetPin });
+  if (!foundUser) {
+    return responses.buildFailureResponse("Invalid OTP", 400);
+  }
+
+  return responses.buildSuccessResponse("User found", 200, foundUser);
+};
+
 module.exports = {
   createUserService,
   userLoginService,
+  forgotPasswordService,
+  verifyOTPService,
 };

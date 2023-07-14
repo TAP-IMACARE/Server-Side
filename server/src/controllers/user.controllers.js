@@ -24,7 +24,33 @@ const userLoginController = async (req, res) => {
   }
 };
 
+const forgotPasswordController = async (req, res) => {
+  try {
+    const response = await userServices.forgotPasswordService(req.body);
+    res.status(response.statusCode).json(response);
+  } catch (error) {
+    return res.status(500).json({
+      message: "Unable to send OTP",
+      status: "failure",
+    });
+  }
+};
+
+const verifyOTPController = async (req, res) => {
+  try {
+    const response = await userServices.verifyOTPService(req.body);
+    res.status(response.statusCode).json(response);
+  } catch (error) {
+    return res.status(500).json({
+      message: "Unable to verify",
+      status: "failure",
+    });
+  }
+};
+
 module.exports = {
   createUserController,
   userLoginController,
+  forgotPasswordController,
+  verifyOTPController,
 };

@@ -19,6 +19,9 @@ const User = mongoose.Schema(
       type: String,
       required: true,
     },
+    resetPin: {
+      type: Number,
+    },
   },
   { timestamps: true }
 );
