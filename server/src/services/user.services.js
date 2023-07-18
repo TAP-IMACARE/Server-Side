@@ -70,7 +70,13 @@ const forgotPasswordService = async (payload) => {
     { new: true }
   );
 
-  sendMail(updatedUser.emailAddress, resetPin);
+  const forgotPasswordPayload = {
+    to: updatedUser.emailAddress,
+    subject: "RESET PASSWORD",
+    pin: resetPin,
+  };
+
+  await sendMail.sendPasswordResetMail(forgotPasswordPayload);
   return responses.buildSuccessResponse(
     "OTP sent Succesfully",
     200,
@@ -78,19 +84,35 @@ const forgotPasswordService = async (payload) => {
   );
 };
 
-const verifyOTPService = async (payload) => {
-  const { resetPin } = payload;
-  const foundUser = await User.findOne({ resetPin: resetPin });
-  if (!foundUser) {
-    return responses.buildFailureResponse("Invalid OTP", 400);
-  }
+const resetPasswordService = async (payload) => {
+  const { emailAddress, resetPin } = payload;
 
-  return responses.buildSuccessResponse("User found", 200, foundUser);
+  const foundUser = await User.findOne(
+    { emailAddress: emailAddress },
+    { resetPin: resetPin }
+  );
+  if (!foundUser) {
+    return responses.buildFailureResponse("User not found", 400);
+  }
+  const generatedSalt = await bcrypt.genSalt(parseInt(process.env.salt_rounds));
+  const hashedPassword = await bcrypt.hash(payload.password, generatedSalt);
+
+  const updatedUser = await User.findByIdAndUpdate(
+    { _id: foundUser._id },
+    { password: hashedPassword, resetPin: null },
+    { new: true }
+  );
+
+  return responses.buildSuccessResponse(
+    "Password Reset Successful",
+    200,
+    updatedUser
+  );
 };
 
 module.exports = {
   createUserService,
   userLoginService,
   forgotPasswordService,
-  verifyOTPService,
+  resetPasswordService,
 };

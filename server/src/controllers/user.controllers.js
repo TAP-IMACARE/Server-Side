@@ -36,9 +36,9 @@ const forgotPasswordController = async (req, res) => {
   }
 };
 
-const verifyOTPController = async (req, res) => {
+const resetPasswordController = async (req, res) => {
   try {
-    const response = await userServices.verifyOTPService(req.body);
+    const response = await userServices.resetPasswordService(req.body);
     res.status(response.statusCode).json(response);
   } catch (error) {
     return res.status(500).json({
@@ -52,5 +52,5 @@ module.exports = {
   createUserController,
   userLoginController,
   forgotPasswordController,
-  verifyOTPController,
+  resetPasswordController,
 };

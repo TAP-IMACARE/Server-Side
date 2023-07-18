@@ -66,37 +66,59 @@ const adminLoginService = async (payload) => {
 
 const forgotPasswordService = async (payload) => {
   const { emailAddress } = payload;
-  const foundUser = await Admin.findOne({ emailAddress: emailAddress });
+  const foundAdmin = await Admin.findOne({ emailAddress: emailAddress });
   if (!emailAddress) {
     return responses.buildFailureResponse("Admin does not exist", 400);
   }
   const resetPin = generateResetPin();
-  const updatedUser = await Admin.findByIdAndUpdate(
-    { _id: foundUser._id },
+  const updatedAdmin = await Admin.findByIdAndUpdate(
+    { _id: foundAdmin._id },
     { resetPin: resetPin },
     { new: true }
   );
-  sendMail(updatedUser.emailAddress, resetPin);
+
+  const forgotPasswordPayload = {
+    to: updatedAdmin.emailAddress,
+    subject: "RESET PASSWORD",
+    pin: resetPin,
+  };
+  await sendMail.sendPasswordResetMail(forgotPasswordPayload);
   return responses.buildSuccessResponse(
     "OTP sent successfully",
     200,
-    updatedUser
+    updatedAdmin
   );
 };
 
-const verifyOTPService = async (payload) => {
-  const { resetPin } = payload;
-  const foundUser = await Admin.findOne({ resetPin: resetPin });
-  if (!foundUser) {
-    return responses.buildFailureResponse("Invalid OTP", 400);
-  }
+const resetPasswordService = async (payload) => {
+  const { emailAddress, resetPin } = payload;
 
-  return responses.buildSuccessResponse("User found", 200, foundUser);
+  const foundAdmin = await Admin.findOne(
+    { emailAddress: emailAddress },
+    { resetPin: resetPin }
+  );
+  if (!foundAdmin) {
+    return responses.buildFailureResponse("Admin not found", 400);
+  }
+  const generatedSalt = await bcrypt.genSalt(parseInt(process.env.salt_rounds));
+  const hashedPassword = await bcrypt.hash(payload.password, generatedSalt);
+
+  const updatedAdmin = await Admin.findByIdAndUpdate(
+    { _id: foundAdmin._id },
+    { password: hashedPassword, resetPin: null },
+    { new: true }
+  );
+
+  return responses.buildSuccessResponse(
+    "Password Reset Successful",
+    200,
+    updatedAdmin
+  );
 };
 
 module.exports = {
   adminSignUpService,
   adminLoginService,
   forgotPasswordService,
-  verifyOTPService,
+  resetPasswordService,
 };
