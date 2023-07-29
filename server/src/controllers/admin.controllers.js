@@ -47,6 +47,9 @@ const resetPasswordController = async (req, res) => {
     });
   }
 };
+
+
+
 module.exports = {
   adminSignUpController,
   adminLoginController,

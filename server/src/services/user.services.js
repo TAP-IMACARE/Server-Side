@@ -1,6 +1,8 @@
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 const User = require("../models/user.model");
+const Appointment = require("../models/appointment.model");
+const Doctor = require("../models/doctor.model");
 const responses = require("../utils/response");
 const sendMail = require("../utils/resetPasswordMail");
 const generateResetPin = require("../utils/generateResetPin");
@@ -110,9 +112,34 @@ const resetPasswordService = async (payload) => {
   );
 };
 
+const createAppointmentService = async (payload) => {
+  const { firstName, lastName, specialization, time, date, author } = payload;
+  const appointmentExists = await Appointment.findOne(
+    { firstName: firstName },
+    { lastName: lastName },
+    { specialization: specialization },
+    { time: time },
+    { date: date }
+  );
+
+  if (appointmentExists) {
+    return responses.buildFailureResponse(
+      "The doctor will not be available at this time",
+      400
+    );
+  }
+  const appointment = await Appointment.create(payload);
+  return responses.buildSuccessResponse(
+    "Appointment succesfully created",
+    200,
+    appointment
+  );
+};
+
 module.exports = {
   createUserService,
   userLoginService,
   forgotPasswordService,
   resetPasswordService,
+  createAppointmentService,
 };

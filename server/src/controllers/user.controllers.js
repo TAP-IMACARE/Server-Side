@@ -48,9 +48,22 @@ const resetPasswordController = async (req, res) => {
   }
 };
 
+const createAppointmentController = async (req, res) => {
+  try {
+    const response = await userServices.createAppointmentService(req.body);
+    res.status(response.statusCode).json(response);
+  } catch (error) {
+    return res.status(500).json({
+      message: "Unable to create appointment",
+      status: "failure",
+    });
+  }
+};
+
 module.exports = {
   createUserController,
   userLoginController,
   forgotPasswordController,
   resetPasswordController,
+  createAppointmentController,
 };
