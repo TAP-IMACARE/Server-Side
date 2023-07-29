@@ -48,11 +48,22 @@ const resetPasswordController = async (req, res) => {
   }
 };
 
-
+const createDoctorController = async (req, res) => {
+  try {
+    const response = await adminServices.createDoctorService(req.body);
+    res.status(response.statusCode).json(response);
+  } catch (error) {
+    return res.status(500).json({
+      message: "Unable to create",
+      status: "failure",
+    });
+  }
+};
 
 module.exports = {
   adminSignUpController,
   adminLoginController,
   forgotPasswordController,
   resetPasswordController,
+  createDoctorController,
 };

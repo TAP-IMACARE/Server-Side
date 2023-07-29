@@ -2,6 +2,7 @@ const responses = require("../utils/response");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 const Admin = require("../models/admin.model");
+const Doctor = require("../models/doctor.model");
 const generateResetPin = require("../utils/generateResetPin");
 const sendMail = require("../utils/resetPasswordMail");
 
@@ -116,9 +117,37 @@ const resetPasswordService = async (payload) => {
   );
 };
 
+const createDoctorService = async (payload) => {
+  const {
+    firstName,
+    lastName,
+    specialization,
+    phoneNumber,
+    emailAddress,
+    gender,
+  } = payload;
+
+  const foundNumber = await Doctor.findOne({ phoneNumber: phoneNumber });
+  if (foundNumber) {
+    return responses.buildFailureResponse("Phone Number already exists", 400);
+  }
+  const foundEmail = await Doctor.findOne({ emailAddress: emailAddress });
+  if (foundEmail) {
+    return responses.buildFailureResponse("Email Address already exists", 400);
+  }
+
+  const newDoctor = await Doctor.create(payload);
+  return responses.buildSuccessResponse(
+    "Doctor created succesfully",
+    200,
+    newDoctor
+  );
+};
+
 module.exports = {
   adminSignUpService,
   adminLoginService,
   forgotPasswordService,
   resetPasswordService,
+  createDoctorService,
 };

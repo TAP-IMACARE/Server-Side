@@ -16,13 +16,16 @@ const Doctor = mongoose.Schema({
   phoneNumber: {
     type: String,
     required: true,
+    unique: true,
   },
   emailAddress: {
     type: String,
     required: true,
+    unique: true,
   },
   gender: {
     type: String,
+    required: true,
   },
 });
 

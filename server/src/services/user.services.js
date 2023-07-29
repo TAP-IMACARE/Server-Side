@@ -128,11 +128,11 @@ const createAppointmentService = async (payload) => {
       400
     );
   }
-  const appointment = await Appointment.create(payload);
+  const newAppointment = await Appointment.create(payload);
   return responses.buildSuccessResponse(
     "Appointment succesfully created",
     200,
-    appointment
+    newAppointment
   );
 };
 
