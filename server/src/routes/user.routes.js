@@ -9,8 +9,14 @@ router.post("/forgot-password", userControllers.forgotPasswordController);
 router.post("/reset-password", userControllers.resetPasswordController);
 router.post(
   "/create-appointment",
-  authMiddleware.authenticate,
+  authMiddleware.authenticateUser,
   userControllers.createAppointmentController
+);
+
+router.get(
+  "/allappointments",
+  authMiddleware.authenticateUser,
+  userControllers.getUserAppointmentControllers
 );
 
 module.exports = router;

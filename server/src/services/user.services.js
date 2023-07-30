@@ -40,6 +40,7 @@ const userLoginService = async (payload) => {
 
   const token = jwt.sign(
     {
+      _id: foundUser._id,
       firstName: foundUser.firstName,
       lastName: foundUser.lastName,
       emailAddress: foundUser.emailAddress,
@@ -112,8 +113,8 @@ const resetPasswordService = async (payload) => {
   );
 };
 
-const createAppointmentService = async (payload) => {
-  const { firstName, lastName, specialization, time, date, author } = payload;
+const createAppointmentService = async (payload, appointee) => {
+  const { firstName, lastName, specialization, time, date } = payload;
   const appointmentExists = await Appointment.findOne(
     { firstName: firstName },
     { lastName: lastName },
@@ -128,11 +129,26 @@ const createAppointmentService = async (payload) => {
       400
     );
   }
+
+  payload.author = appointee._id;
   const newAppointment = await Appointment.create(payload);
   return responses.buildSuccessResponse(
     "Appointment succesfully created",
     200,
     newAppointment
+  );
+};
+
+const getUserAppointmentService = async (user) => {
+  const foundAppointment = await Appointment.find({ author: user._id });
+  if (foundAppointment.length === 0) {
+    return responses.buildFailureResponse("No available appointments", 400);
+  }
+
+  return responses.buildSuccessResponse(
+    "Available appointments",
+    200,
+    foundAppointment
   );
 };
 
@@ -142,4 +158,5 @@ module.exports = {
   forgotPasswordService,
   resetPasswordService,
   createAppointmentService,
+  getUserAppointmentService,
 };

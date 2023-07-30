@@ -50,7 +50,10 @@ const resetPasswordController = async (req, res) => {
 
 const createAppointmentController = async (req, res) => {
   try {
-    const response = await userServices.createAppointmentService(req.body);
+    const response = await userServices.createAppointmentService(
+      req.body,
+      req.user
+    );
     res.status(response.statusCode).json(response);
   } catch (error) {
     return res.status(500).json({
@@ -60,10 +63,25 @@ const createAppointmentController = async (req, res) => {
   }
 };
 
+const getUserAppointmentControllers = async (req, res) => {
+  // try {
+  //   const response = userServices.getUserAppointmentsService(req.user);
+  //   res.status(response.statusCode).json(response);
+  // } catch (error) {
+  //   return res.status(500).json({
+  //     message: "Unable to get appointments",
+  //     status: "failure",
+  //   });
+  // }
+  const response = await userServices.getUserAppointmentService(req.user);
+  res.status(response.statusCode).json(response);
+};
+
 module.exports = {
   createUserController,
   userLoginController,
   forgotPasswordController,
   resetPasswordController,
   createAppointmentController,
+  getUserAppointmentControllers,
 };

@@ -7,10 +7,6 @@ router.post("/createadmin", adminController.adminSignUpController);
 router.post("/adminlogin", adminController.adminLoginController);
 router.post("/forgot-password", adminController.forgotPasswordController);
 router.post("/reset-password", adminController.resetPasswordController);
-router.post(
-  "/create-doctor",
-  authMiddleware.authenticate,
-  adminController.createDoctorController
-);
+router.post("/create-doctor", adminController.createDoctorController);
 
 module.exports = router;

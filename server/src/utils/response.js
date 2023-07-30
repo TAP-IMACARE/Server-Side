@@ -18,6 +18,7 @@ const buildSuccessResponse = (message, statusCode, data) => {
   return {
     message,
     statusCode,
+    status: "success",
   };
 };
 

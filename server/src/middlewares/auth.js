@@ -1,7 +1,8 @@
 const jwt = require("jsonwebtoken");
 const Admin = require("../models/user.model");
+const User = require("../models/user.model");
 
-const authenticate = async (req, res, next) => {
+const authenticateUser = async (req, res, next) => {
   try {
     const authorization = req.headers.authorization;
     if (!authorization || !authorization.startsWith("Bearer ")) {
@@ -12,8 +13,8 @@ const authenticate = async (req, res, next) => {
     }
     const token = authorization.substring(7);
     const decodedUser = jwt.decode(token);
-    const foundAdmin = await Admin.findOne({ _id: decodedUser._id });
-    req.user = foundAdmin;
+    const foundUser = await User.findOne({ _id: decodedUser._id });
+    req.user = foundUser;
     next();
   } catch (error) {
     return res
@@ -23,5 +24,5 @@ const authenticate = async (req, res, next) => {
 };
 
 module.exports = {
-  authenticate,
+  authenticateUser,
 };

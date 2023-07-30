@@ -25,7 +25,6 @@ const Appointment = mongoose.Schema(
     author: {
       type: mongoose.Types.ObjectId,
       ref: "User",
-      required: true,
     },
   },
   {

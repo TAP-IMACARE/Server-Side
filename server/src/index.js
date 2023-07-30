@@ -3,6 +3,7 @@ const dotenv = require("dotenv");
 const rateLimit = require("express-rate-limit");
 const userRouter = require("./routes/user.routes");
 const adminRouter = require("./routes/admin.routes");
+const paymentRouter = require("./routes/payment.routes");
 const connectDB = require("./configs/database");
 
 const limiter = rateLimit({
@@ -19,11 +20,12 @@ app.use(express.json());
 app.use(limiter);
 app.use("/user", userRouter);
 app.use("/admin", adminRouter);
+app.use("/pay", paymentRouter);
 
-connectDB(process.env.mongo_uri);
+connectDB(process.env.MONGO_URI);
 
 app.listen(PORT, () => {
-  console.log(`Server is running with speed at ${PORT}`);
+  console.log(`Server is running with speed at PORT ${PORT}`);
 });
 
 app.get("/", (req, res) => {
