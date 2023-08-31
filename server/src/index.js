@@ -4,6 +4,7 @@ const rateLimit = require("express-rate-limit");
 const userRouter = require("./routes/user.routes");
 const adminRouter = require("./routes/admin.routes");
 const paymentRouter = require("./routes/payment.routes");
+const seedAdmin = require("./seeding/index");
 const connectDB = require("./configs/database");
 
 const limiter = rateLimit({
@@ -23,6 +24,7 @@ app.use("/admin", adminRouter);
 app.use("/pay", paymentRouter);
 
 connectDB(process.env.MONGO_URI);
+seedAdmin();
 
 app.listen(PORT, () => {
   console.log(`Server is running with speed at PORT ${PORT}`);
