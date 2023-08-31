@@ -11,7 +11,7 @@ router.post(
 );
 router.post(
   "/userlogin",
-  inputValidator.adminLoginValidator,
+  inputValidator.userLoginValidator,
   userControllers.userLoginController
 );
 router.post("/forgot-password", userControllers.forgotPasswordController);

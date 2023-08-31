@@ -53,7 +53,7 @@ const adminLoginValidator = async (req, res, next) => {
 
 const userLoginValidator = async (req, res, next) => {
   const schema = Joi.object().keys({
-    contactEmail: Joi.string().email().required(),
+    emailAddress: Joi.string().email().required(),
     password: Joi.string(),
   });
   try {
